@@ -1091,7 +1091,12 @@ impl input::Processor<EventProxy, ActionContext<'_, Notifier, EventProxy>> {
                         self.key_input(input);
                     },
                     WindowEvent::ModifiersChanged(modifiers) => self.modifiers_input(modifiers),
-                    WindowEvent::ReceivedCharacter(c) => self.received_char(c),
+                    WindowEvent::ReceivedCharacter(c) => {
+                        info!("char event: {:?}", c);
+                        if self.ctx.window().ime_buffer.is_none() {
+                            self.received_char(c)
+                        }
+                    },
                     WindowEvent::MouseInput { state, button, .. } => {
                         self.ctx.window().set_mouse_visible(true);
                         self.mouse_input(state, button);
@@ -1131,14 +1136,19 @@ impl input::Processor<EventProxy, ActionContext<'_, Notifier, EventProxy>> {
                     },
                     WindowEvent::IME(ime) => {
                         info!("IME event: {:?}", ime);
+                        use glutin::event::IME;
                         match ime {
-                            glutin::event::IME::Preedit(text, ..) => {
+                            IME::Preedit(text, ..) => {
                                 self.ctx.window().ime_buffer = Some(text);
                                 *self.ctx.dirty = true;
                             },
-                            glutin::event::IME::Commit(_) => {
+                            IME::Commit(text) => {
                                 self.ctx.window().ime_buffer = None;
                                 *self.ctx.dirty = true;
+
+                                for c in text.chars() {
+                                    self.received_char(c);
+                                }
                             },
                             _ => {},
                         }
