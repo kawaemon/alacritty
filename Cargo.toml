@@ -9,3 +9,7 @@ members = [
 lto = true
 debug = 1
 incremental = false
+
+# TODO: delete this before creating PR
+[patch.crates-io]
+winit = { git = "https://github.com/kawaemon/winit.git", branch = "fix-composition" }
