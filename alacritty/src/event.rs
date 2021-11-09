@@ -1129,6 +1129,20 @@ impl input::Processor<EventProxy, ActionContext<'_, Notifier, EventProxy>> {
                             *self.ctx.dirty = true;
                         }
                     },
+                    WindowEvent::IME(ime) => {
+                        info!("IME event: {:?}", ime);
+                        match ime {
+                            glutin::event::IME::Preedit(text, ..) => {
+                                self.ctx.window().ime_buffer = Some(text);
+                                *self.ctx.dirty = true;
+                            },
+                            glutin::event::IME::Commit(_) => {
+                                self.ctx.window().ime_buffer = None;
+                                *self.ctx.dirty = true;
+                            },
+                            _ => {},
+                        }
+                    },
                     WindowEvent::KeyboardInput { is_synthetic: true, .. }
                     | WindowEvent::TouchpadPressure { .. }
                     | WindowEvent::ScaleFactorChanged { .. }

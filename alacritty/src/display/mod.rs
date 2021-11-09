@@ -578,6 +578,20 @@ impl Display {
             rects.push(visual_bell_rect);
         }
 
+        if let Some(ref ime_buf) = self.window.ime_buffer {
+            if let Some(cursor) = cursor {
+                let glyph_cache = &mut self.glyph_cache;
+                let bg = config.ui_config.colors.primary.background;
+                let fg = config.ui_config.colors.primary.foreground;
+                let point = cursor.point();
+                let text = ime_buf.chars().flat_map(|c| [c, ' ']).collect::<String>();
+
+                self.renderer.with_api(&config.ui_config, &size_info, |mut api| {
+                    api.render_string(glyph_cache, point, fg, bg, text.trim());
+                });
+            }
+        }
+
         if let Some(message) = message_buffer.message() {
             let search_offset = if search_state.regex().is_some() { 1 } else { 0 };
             let text = message.text(&size_info);
