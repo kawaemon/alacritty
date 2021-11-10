@@ -142,8 +142,6 @@ fn alacritty(options: Options) -> Result<(), String> {
     log_config_path(&config);
 
     // Update the log level from config.
-    log::set_max_level(config.ui_config.debug.log_level);
-
     // Set environment variables.
     tty::setup_env(&config);
 

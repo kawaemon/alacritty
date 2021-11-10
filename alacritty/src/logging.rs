@@ -28,13 +28,8 @@ pub fn initialize(
     options: &Options,
     event_proxy: EventLoopProxy<Event>,
 ) -> Result<Option<PathBuf>, log::SetLoggerError> {
-    log::set_max_level(options.log_level());
-
-    let logger = Logger::new(event_proxy);
-    let path = logger.file_path();
-    log::set_boxed_logger(Box::new(logger))?;
-
-    Ok(path)
+    env_logger::init();
+    Ok(None)
 }
 
 pub struct Logger {
